@@ -49,3 +49,19 @@ export async function fetchHabiticaTasks(userId: string): Promise<HabiticaTasks>
   if (!res.ok) throw new Error("Failed to fetch Habitica tasks");
   return res.json();
 }
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  calendar: string;
+  all_day: boolean;
+  start: string;
+  end: string;
+}
+
+export async function fetchCalendarToday(userId: string): Promise<CalendarEvent[]> {
+  const res = await fetch(`/api/users/${userId}/calendar/today`);
+  if (res.status === 404) return []; // not connected yet
+  if (!res.ok) throw new Error("Failed to fetch calendar events");
+  return res.json();
+}

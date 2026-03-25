@@ -1,6 +1,7 @@
 import "./style.css";
 import { fetchUsers, type User } from "./api";
 import { renderHabiticaWidget, refreshHabiticaWidget } from "./widgets/habitica";
+import { renderCalendarWidget, refreshCalendarWidget } from "./widgets/calendar";
 
 function renderUserSelect(users: User[]) {
   const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -60,10 +61,7 @@ function renderDashboard(user: User) {
         <span class="text-muted text-lg">— ${user.name}</span>
       </header>
       <main class="grid grid-cols-2 gap-4 md:grid-cols-3">
-        <div class="bg-surface rounded-2xl p-5 border border-border">
-          <h2 class="text-lg font-semibold mb-2 text-text" style="font-family:'Montserrat',sans-serif">Calendar</h2>
-          <p class="text-sm text-muted">Coming soon</p>
-        </div>
+        <div id="widget-calendar" class="bg-surface rounded-2xl p-5 border border-border"></div>
         <div class="bg-surface rounded-2xl p-5 border border-border">
           <h2 class="text-lg font-semibold mb-2 text-text" style="font-family:'Montserrat',sans-serif">To-Do</h2>
           <p class="text-sm text-muted">Coming soon</p>
@@ -73,12 +71,14 @@ function renderDashboard(user: User) {
     </div>
   `;
 
-  const habiticaEl = app.querySelector<HTMLDivElement>("#widget-habitica")!;
-  renderHabiticaWidget(habiticaEl, user.id);
+  renderCalendarWidget(app.querySelector<HTMLDivElement>("#widget-calendar")!, user.id);
+  renderHabiticaWidget(app.querySelector<HTMLDivElement>("#widget-habitica")!, user.id);
 
   refreshInterval = setInterval(() => {
-    const el = document.querySelector<HTMLDivElement>("#widget-habitica");
-    if (el) refreshHabiticaWidget(el, user.id);
+    const calEl = document.querySelector<HTMLDivElement>("#widget-calendar");
+    const habEl = document.querySelector<HTMLDivElement>("#widget-habitica");
+    if (calEl) refreshCalendarWidget(calEl, user.id);
+    if (habEl) refreshHabiticaWidget(habEl, user.id);
   }, 10_000);
 }
 

@@ -61,6 +61,11 @@ func main() {
 	// Habitica
 	mux.HandleFunc("GET /api/users/{id}/habitica/tasks", handlers.GetHabiticaTasks)
 
+	// Google Calendar
+	mux.HandleFunc("GET /api/users/{id}/auth/google", handlers.StartGoogleAuth)
+	mux.HandleFunc("GET /api/auth/google/callback", handlers.GoogleCallback)
+	mux.HandleFunc("GET /api/users/{id}/calendar/today", handlers.GetCalendarToday)
+
 	log.Printf("MirrorBoard backend running on :%s", port)
 	if err := http.ListenAndServe(":"+port, handler); err != nil {
 		log.Fatal(err)
