@@ -1,15 +1,6 @@
 import "./style.css";
-
-interface User {
-  id: string;
-  name: string;
-}
-
-async function fetchUsers(): Promise<User[]> {
-  const res = await fetch("/api/users");
-  if (!res.ok) throw new Error("Failed to fetch users");
-  return res.json();
-}
+import { fetchUsers, type User } from "./api";
+import { renderHabiticaWidget } from "./widgets/habitica";
 
 function renderUserSelect(users: User[]) {
   const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -46,13 +37,14 @@ function renderUserSelect(users: User[]) {
       "cursor-pointer select-none",
     ].join(" ");
     btn.style.fontFamily = "'Montserrat', sans-serif";
-    btn.addEventListener("click", () => enterDashboard(user));
+    btn.addEventListener("click", () => renderDashboard(user));
     list.appendChild(btn);
   }
 }
 
-function enterDashboard(user: User) {
+function renderDashboard(user: User) {
   const app = document.querySelector<HTMLDivElement>("#app")!;
+
   app.innerHTML = `
     <div class="min-h-screen p-6">
       <header class="mb-8 flex items-center gap-4">
@@ -70,13 +62,13 @@ function enterDashboard(user: User) {
           <h2 class="text-lg font-semibold mb-2" style="font-family:'Montserrat',sans-serif">To-Do</h2>
           <p class="text-sm text-gray-400">Coming soon</p>
         </div>
-        <div class="bg-white/60 rounded-2xl p-5 shadow-sm border border-[#e8e2d9]">
-          <h2 class="text-lg font-semibold mb-2" style="font-family:'Montserrat',sans-serif">Habitica</h2>
-          <p class="text-sm text-gray-400">Coming soon</p>
-        </div>
+        <div id="widget-habitica" class="bg-white/60 rounded-2xl p-5 shadow-sm border border-[#e8e2d9]"></div>
       </main>
     </div>
   `;
+
+  const habiticaEl = app.querySelector<HTMLDivElement>("#widget-habitica")!;
+  renderHabiticaWidget(habiticaEl, user.id);
 }
 
 async function init() {
