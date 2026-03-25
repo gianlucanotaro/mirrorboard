@@ -2,6 +2,7 @@ import "./style.css";
 import { fetchUsers, type User } from "./api";
 import { renderHabiticaWidget, refreshHabiticaWidget } from "./widgets/habitica";
 import { renderCalendarWidget, refreshCalendarWidget } from "./widgets/calendar";
+import { renderWeatherWidget, refreshWeatherWidget } from "./widgets/weather";
 
 function renderUserSelect(users: User[]) {
   const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -62,22 +63,22 @@ function renderDashboard(user: User) {
       </header>
       <main class="grid grid-cols-2 gap-4 md:grid-cols-3">
         <div id="widget-calendar" class="bg-surface rounded-2xl p-5 border border-border"></div>
-        <div class="bg-surface rounded-2xl p-5 border border-border">
-          <h2 class="text-lg font-semibold mb-2 text-text" style="font-family:'Montserrat',sans-serif">To-Do</h2>
-          <p class="text-sm text-muted">Coming soon</p>
-        </div>
+        <div id="widget-weather" class="bg-surface rounded-2xl p-5 border border-border"></div>
         <div id="widget-habitica" class="bg-surface rounded-2xl p-5 border border-border"></div>
       </main>
     </div>
   `;
 
   renderCalendarWidget(app.querySelector<HTMLDivElement>("#widget-calendar")!, user.id);
+  renderWeatherWidget(app.querySelector<HTMLDivElement>("#widget-weather")!);
   renderHabiticaWidget(app.querySelector<HTMLDivElement>("#widget-habitica")!, user.id);
 
   refreshInterval = setInterval(() => {
     const calEl = document.querySelector<HTMLDivElement>("#widget-calendar");
+    const wthEl = document.querySelector<HTMLDivElement>("#widget-weather");
     const habEl = document.querySelector<HTMLDivElement>("#widget-habitica");
     if (calEl) refreshCalendarWidget(calEl, user.id);
+    if (wthEl) refreshWeatherWidget(wthEl);
     if (habEl) refreshHabiticaWidget(habEl, user.id);
   }, 10_000);
 }

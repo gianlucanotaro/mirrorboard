@@ -66,3 +66,31 @@ export async function fetchCalendarToday(userId: string): Promise<CalendarEvent[
   if (!res.ok) throw new Error("Failed to fetch calendar events");
   return res.json();
 }
+
+export interface WeatherCurrent {
+  temperature: number;
+  apparent_temperature: number;
+  condition: string;
+  icon: string;
+}
+
+export interface WeatherForecastDay {
+  date: string;
+  icon: string;
+  high: number;
+  low: number;
+}
+
+export interface WeatherData {
+  location: string;
+  current: WeatherCurrent;
+  today_high: number;
+  today_low: number;
+  forecast: WeatherForecastDay[];
+}
+
+export async function fetchWeather(): Promise<WeatherData> {
+  const res = await fetch("/api/weather");
+  if (!res.ok) throw new Error("Failed to fetch weather");
+  return res.json();
+}

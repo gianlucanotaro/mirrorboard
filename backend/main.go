@@ -66,6 +66,9 @@ func main() {
 	mux.HandleFunc("GET /api/auth/google/callback", handlers.GoogleCallback)
 	mux.HandleFunc("GET /api/users/{id}/calendar/today", handlers.GetCalendarToday)
 
+	// Weather
+	mux.HandleFunc("GET /api/weather", handlers.GetWeather)
+
 	log.Printf("MirrorBoard backend running on :%s", port)
 	if err := http.ListenAndServe(":"+port, handler); err != nil {
 		log.Fatal(err)
