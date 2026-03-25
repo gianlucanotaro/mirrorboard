@@ -41,7 +41,14 @@ function renderUserSelect(users: User[]) {
   }
 }
 
+let refreshInterval: ReturnType<typeof setInterval> | null = null;
+
 function renderDashboard(user: User) {
+  if (refreshInterval !== null) {
+    clearInterval(refreshInterval);
+    refreshInterval = null;
+  }
+
   const app = document.querySelector<HTMLDivElement>("#app")!;
 
   app.innerHTML = `
@@ -66,8 +73,14 @@ function renderDashboard(user: User) {
     </div>
   `;
 
-  const habiticaEl = app.querySelector<HTMLDivElement>("#widget-habitica")!;
-  renderHabiticaWidget(habiticaEl, user.id);
+  function refreshWidgets() {
+    const habiticaEl = document.querySelector<HTMLDivElement>("#widget-habitica");
+    if (!habiticaEl) return;
+    renderHabiticaWidget(habiticaEl, user.id);
+  }
+
+  refreshWidgets();
+  refreshInterval = setInterval(refreshWidgets, 10_000);
 }
 
 async function init() {
