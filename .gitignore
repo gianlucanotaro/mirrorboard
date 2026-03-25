@@ -1,0 +1,24 @@
+# Environment
+.env
+.env.*
+!.env.example
+
+# macOS
+.DS_Store
+
+# Node / Frontend
+node_modules/
+dist/
+.vite/
+
+# Go / Backend
+backend/bin/
+backend/*.exe
+
+# Claude
+CLAUDE.md
+
+# Editor
+.idea/
+.vscode/
+*.swp
