@@ -9,9 +9,13 @@ import (
 	"github.com/gianlucanotaro/mirrorboard/internal/crypto"
 	"github.com/gianlucanotaro/mirrorboard/internal/db"
 	"github.com/gianlucanotaro/mirrorboard/internal/handlers"
+	"github.com/joho/godotenv"
 )
 
 func main() {
+	// Load .env if present (ignored in production where vars are set by the environment)
+	_ = godotenv.Load("../.env")
+
 	if err := crypto.LoadKey(); err != nil {
 		log.Fatalf("Encryption key error: %v", err)
 	}
