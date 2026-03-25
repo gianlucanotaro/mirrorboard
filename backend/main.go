@@ -59,7 +59,7 @@ func main() {
 	mux.HandleFunc("DELETE /api/users/{id}/services/{service}", handlers.DeleteService)
 
 	// Habitica
-	mux.HandleFunc("GET /api/users/{id}/habitica/todos", handlers.GetHabiticaTodos)
+	mux.HandleFunc("GET /api/users/{id}/habitica/tasks", handlers.GetHabiticaTasks)
 
 	log.Printf("MirrorBoard backend running on :%s", port)
 	if err := http.ListenAndServe(":"+port, handler); err != nil {

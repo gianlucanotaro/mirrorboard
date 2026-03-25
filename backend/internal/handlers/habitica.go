@@ -8,7 +8,7 @@ import (
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
-func GetHabiticaTodos(w http.ResponseWriter, r *http.Request) {
+func GetHabiticaTasks(w http.ResponseWriter, r *http.Request) {
 	id, err := bson.ObjectIDFromHex(r.PathValue("id"))
 	if err != nil {
 		http.Error(w, "invalid user id", http.StatusBadRequest)
@@ -26,12 +26,12 @@ func GetHabiticaTodos(w http.ResponseWriter, r *http.Request) {
 	}
 
 	client := habitica.NewClient(fields["user_id"], fields["token"])
-	todos, err := client.GetTodos()
+	tasks, err := client.GetAllTasks()
 	if err != nil {
-		http.Error(w, "failed to fetch todos from Habitica", http.StatusBadGateway)
+		http.Error(w, "failed to fetch tasks from Habitica", http.StatusBadGateway)
 		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(todos)
+	json.NewEncoder(w).Encode(tasks)
 }
