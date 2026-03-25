@@ -1,40 +1,56 @@
-import { fetchHabiticaTasks, type Habit, type Daily, type Todo } from "../api";
+import { fetchHabiticaTasks, type Habit, type Daily, type Todo, type HabiticaTasks } from "../api";
 
-export async function renderHabiticaWidget(
-  container: HTMLElement,
-  userId: string
-) {
+let cache: HabiticaTasks | null = null;
+
+// Full render — call once when the dashboard loads.
+export async function renderHabiticaWidget(container: HTMLElement, userId: string) {
+  cache = null;
+
   container.innerHTML = `
-    <h2 class="text-lg font-semibold mb-3 text-text" style="font-family:'Montserrat',sans-serif">Habitica</h2>
-    <p class="text-sm text-muted">Loading...</p>
+    <h2 class="text-lg font-semibold mb-4 text-text" style="font-family:'Montserrat',sans-serif">Habitica</h2>
+    <div class="flex flex-col gap-5">
+      ${section("Habits",  "hab-habits")}
+      ${section("Dailies", "hab-dailies")}
+      ${section("Tasks",   "hab-todos")}
+    </div>
   `;
 
-  let tasks;
+  await refresh(container, userId);
+}
+
+// Patch render — call on interval. Only updates sections whose data changed.
+export async function refreshHabiticaWidget(container: HTMLElement, userId: string) {
+  await refresh(container, userId);
+}
+
+async function refresh(container: HTMLElement, userId: string) {
+  let tasks: HabiticaTasks;
   try {
     tasks = await fetchHabiticaTasks(userId);
   } catch {
-    container.querySelector("p")!.textContent = "Failed to load tasks.";
-    return;
+    return; // silently skip failed refreshes — don't blank out the widget
   }
 
-  container.innerHTML = `
-    <h2 class="text-lg font-semibold mb-4 text-text" style="font-family:'Montserrat',sans-serif">
-      Habitica
-    </h2>
-    <div class="flex flex-col gap-5">
-      ${renderSection("Habits", habitsHtml(tasks.habits))}
-      ${renderSection("Dailies", dailiesHtml(tasks.dailies))}
-      ${renderSection("Tasks", todosHtml(tasks.todos))}
-    </div>
-  `;
+  patch(container, "hab-habits",  habitsHtml(tasks.habits),  cache ? habitsHtml(cache.habits)  : null);
+  patch(container, "hab-dailies", dailiesHtml(tasks.dailies), cache ? dailiesHtml(cache.dailies) : null);
+  patch(container, "hab-todos",   todosHtml(tasks.todos),    cache ? todosHtml(cache.todos)    : null);
+
+  cache = tasks;
 }
 
-function renderSection(title: string, content: string): string {
+// Only writes to the DOM if the rendered HTML actually changed.
+function patch(container: HTMLElement, id: string, newHtml: string, oldHtml: string | null) {
+  if (newHtml === oldHtml) return;
+  const el = container.querySelector<HTMLElement>(`#${id}`);
+  if (el) el.innerHTML = newHtml;
+}
+
+function section(title: string, id: string): string {
   return `
     <div>
       <p class="text-xs font-semibold uppercase tracking-widest text-muted mb-2"
          style="font-family:'Montserrat',sans-serif">${title}</p>
-      <ul class="flex flex-col">${content}</ul>
+      <ul id="${id}" class="flex flex-col"></ul>
     </div>
   `;
 }
@@ -44,8 +60,8 @@ function habitsHtml(habits: Habit[]): string {
   return habits.map((h) => `
     <li class="flex items-center gap-3 py-2 border-b border-border last:border-0">
       <span class="flex gap-1 flex-shrink-0">
-        ${h.up ? `<span class="text-primary text-xs font-bold leading-none">▲${h.counterUp}</span>` : ""}
-        ${h.down ? `<span class="text-muted text-xs font-bold leading-none">▼${h.counterDown}</span>` : ""}
+        ${h.up   ? `<span class="text-primary text-xs font-bold leading-none">▲${h.counterUp}</span>`   : ""}
+        ${h.down ? `<span class="text-muted   text-xs font-bold leading-none">▼${h.counterDown}</span>` : ""}
       </span>
       <span class="text-sm text-text leading-snug">${escapeHtml(h.text)}</span>
     </li>`

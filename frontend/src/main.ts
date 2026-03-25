@@ -1,6 +1,6 @@
 import "./style.css";
 import { fetchUsers, type User } from "./api";
-import { renderHabiticaWidget } from "./widgets/habitica";
+import { renderHabiticaWidget, refreshHabiticaWidget } from "./widgets/habitica";
 
 function renderUserSelect(users: User[]) {
   const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -73,14 +73,13 @@ function renderDashboard(user: User) {
     </div>
   `;
 
-  function refreshWidgets() {
-    const habiticaEl = document.querySelector<HTMLDivElement>("#widget-habitica");
-    if (!habiticaEl) return;
-    renderHabiticaWidget(habiticaEl, user.id);
-  }
+  const habiticaEl = app.querySelector<HTMLDivElement>("#widget-habitica")!;
+  renderHabiticaWidget(habiticaEl, user.id);
 
-  refreshWidgets();
-  refreshInterval = setInterval(refreshWidgets, 10_000);
+  refreshInterval = setInterval(() => {
+    const el = document.querySelector<HTMLDivElement>("#widget-habitica");
+    if (el) refreshHabiticaWidget(el, user.id);
+  }, 10_000);
 }
 
 async function init() {
