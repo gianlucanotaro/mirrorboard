@@ -91,9 +91,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	}
 
 	var input struct {
-		Name           string `json:"name"`
-		HabiticaUserID string `json:"habitica_user_id"`
-		HabiticaToken  string `json:"habitica_api_token"`
+		Name string `json:"name"`
 	}
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
 		http.Error(w, "invalid request body", http.StatusBadRequest)
@@ -103,12 +101,6 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 	update := bson.M{}
 	if input.Name != "" {
 		update["name"] = input.Name
-	}
-	if input.HabiticaUserID != "" {
-		update["habitica_user_id"] = input.HabiticaUserID
-	}
-	if input.HabiticaToken != "" {
-		update["habitica_api_token"] = input.HabiticaToken
 	}
 
 	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)

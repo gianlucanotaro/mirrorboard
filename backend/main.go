@@ -6,11 +6,16 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gianlucanotaro/mirrorboard/internal/crypto"
 	"github.com/gianlucanotaro/mirrorboard/internal/db"
 	"github.com/gianlucanotaro/mirrorboard/internal/handlers"
 )
 
 func main() {
+	if err := crypto.LoadKey(); err != nil {
+		log.Fatalf("Encryption key error: %v", err)
+	}
+
 	db.Connect()
 	defer db.Disconnect()
 
@@ -43,6 +48,11 @@ func main() {
 	mux.HandleFunc("POST /api/users", handlers.CreateUser)
 	mux.HandleFunc("GET /api/users/{id}", handlers.GetUser)
 	mux.HandleFunc("PUT /api/users/{id}", handlers.UpdateUser)
+
+	// Services (credentials per user, stored encrypted)
+	mux.HandleFunc("GET /api/users/{id}/services", handlers.GetServices)
+	mux.HandleFunc("PUT /api/users/{id}/services/{service}", handlers.UpsertService)
+	mux.HandleFunc("DELETE /api/users/{id}/services/{service}", handlers.DeleteService)
 
 	log.Printf("MirrorBoard backend running on :%s", port)
 	if err := http.ListenAndServe(":"+port, handler); err != nil {
