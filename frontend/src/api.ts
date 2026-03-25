@@ -54,6 +54,7 @@ export interface CalendarEvent {
   id: string;
   title: string;
   calendar: string;
+  color: string;
   all_day: boolean;
   start: string;
   end: string;

@@ -14,6 +14,7 @@ type Event struct {
 	ID        string `json:"id"`
 	Title     string `json:"title"`
 	Calendar  string `json:"calendar"`
+	Color     string `json:"color"` // calendar background color hex
 	AllDay    bool   `json:"all_day"`
 	Start     string `json:"start"` // RFC3339 or date string
 	End       string `json:"end"`
@@ -54,6 +55,7 @@ func GetTodayEvents(ctx context.Context, cfg *oauth2.Config, token *oauth2.Token
 				ID:       item.Id,
 				Title:    item.Summary,
 				Calendar: cal.Summary,
+				Color:    cal.BackgroundColor,
 			}
 			if item.Start.DateTime != "" {
 				e.Start = item.Start.DateTime
