@@ -73,17 +73,22 @@ PORT=8080
 
 > **Keep your `ENCRYPTION_KEY` backed up.** If lost, all stored service credentials become unrecoverable.
 
-### 3. Install frontend dependencies
+### 3. Run
+
+**With Docker (recommended):**
 
 ```bash
-cd frontend && npm install
+docker compose up --build
 ```
 
-### 4. Run
+Open [http://localhost](http://localhost).
 
-Open two terminals:
+**Without Docker (local dev):**
 
 ```bash
+# Install frontend dependencies once
+cd frontend && npm install && cd ..
+
 # Terminal 1 — backend
 cd backend && go run main.go
 
@@ -218,5 +223,5 @@ Edit that block to retheme the entire app. No other files need changing.
 
 - [ ] Calendar widget
 - [ ] To-do widget (independent of Habitica)
-- [ ] Docker setup
+- [x] Docker setup
 - [ ] Widget layout customisation
