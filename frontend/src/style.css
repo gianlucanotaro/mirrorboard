@@ -1,24 +1,36 @@
 @import "tailwindcss";
 
+/* ─── Design tokens ────────────────────────────────────────────────────────
+   All visual decisions live here. To retheme the app, only edit this block.
+   ─────────────────────────────────────────────────────────────────────── */
 @theme {
-  --color-primary: #2d5016;
-  --color-cream: #f5f0e8;
-  --color-warm-gray: #e8e2d9;
+  /* Backgrounds */
+  --color-bg:      #0d0d0d;   /* page background      */
+  --color-surface: #161616;   /* cards / panels       */
 
+  /* Borders */
+  --color-border:  #2a2a2a;
+
+  /* Text */
+  --color-text:    #e8e8e8;   /* primary text         */
+  --color-muted:   #4a4a4a;   /* secondary / captions */
+
+  /* Brand accent — lightened from #2d5016 for dark-bg contrast */
+  --color-primary:    #5da82d;
+  --color-primary-fg: #f0ece0;
+
+  /* Typography */
   --font-heading: "Montserrat", sans-serif;
-  --font-body: "Open Sans", sans-serif;
+  --font-body:    "Open Sans", sans-serif;
 }
 
 body {
   font-family: var(--font-body);
-  background-color: var(--color-cream);
-  color: #1a1a1a;
+  background-color: var(--color-bg);
+  color: var(--color-text);
   margin: 0;
 }
 
-h1,
-h2,
-h3,
-h4 {
+h1, h2, h3, h4 {
   font-family: var(--font-heading);
 }
