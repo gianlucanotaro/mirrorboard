@@ -54,17 +54,17 @@ function renderDashboard(user: User) {
   const app = document.querySelector<HTMLDivElement>("#app")!;
 
   app.innerHTML = `
-    <div class="min-h-screen p-6">
-      <header class="mb-8 flex items-center gap-4">
+    <div class="h-full p-6 flex flex-col">
+      <header class="mb-4 flex items-center gap-4 flex-shrink-0">
         <h1 class="text-3xl font-semibold text-primary" style="font-family:'Montserrat',sans-serif">
           MirrorBoard
         </h1>
         <span class="text-muted text-lg">— ${user.name}</span>
       </header>
-      <main class="grid grid-cols-2 gap-4 md:grid-cols-3">
-        <div id="widget-calendar" class="bg-surface rounded-2xl p-5 border border-border"></div>
-        <div id="widget-weather" class="bg-surface rounded-2xl p-5 border border-border"></div>
-        <div id="widget-habitica" class="bg-surface rounded-2xl p-5 border border-border"></div>
+      <main class="flex-1 min-h-0 grid grid-cols-2 gap-4 md:grid-cols-3">
+        <div id="widget-calendar" class="bg-surface rounded-2xl p-5 border border-border flex flex-col min-h-0"></div>
+        <div id="widget-weather" class="bg-surface rounded-2xl p-5 border border-border overflow-y-auto"></div>
+        <div id="widget-habitica" class="bg-surface rounded-2xl p-5 border border-border overflow-y-auto"></div>
       </main>
     </div>
   `;

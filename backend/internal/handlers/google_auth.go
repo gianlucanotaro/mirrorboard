@@ -7,6 +7,7 @@ import (
 
 	googleinternal "github.com/gianlucanotaro/mirrorboard/internal/google"
 	"go.mongodb.org/mongo-driver/v2/bson"
+	"golang.org/x/oauth2"
 
 	"github.com/gianlucanotaro/mirrorboard/internal/crypto"
 	"github.com/gianlucanotaro/mirrorboard/internal/db"
@@ -23,7 +24,7 @@ func StartGoogleAuth(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cfg := googleinternal.OAuthConfig()
-	url := cfg.AuthCodeURL(userID)
+	url := cfg.AuthCodeURL(userID, oauth2.AccessTypeOffline, oauth2.ApprovalForce)
 	http.Redirect(w, r, url, http.StatusTemporaryRedirect)
 }
 

@@ -2,6 +2,7 @@ package google
 
 import (
 	"os"
+	"time"
 
 	"golang.org/x/oauth2"
 	"golang.org/x/oauth2/google"
@@ -23,5 +24,6 @@ func TokenFromFields(fields map[string]string) *oauth2.Token {
 		AccessToken:  fields["access_token"],
 		RefreshToken: fields["refresh_token"],
 		TokenType:    "Bearer",
+		Expiry:       time.Now().Add(-time.Minute), // force refresh; we don't store expiry
 	}
 }

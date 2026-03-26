@@ -62,8 +62,7 @@ export interface CalendarEvent {
 
 export async function fetchCalendarToday(userId: string): Promise<CalendarEvent[]> {
   const res = await fetch(`/api/users/${userId}/calendar/today`);
-  if (res.status === 404) return []; // not connected yet
-  if (!res.ok) throw new Error("Failed to fetch calendar events");
+  if (!res.ok) return []; // not connected, expired token, or other error — show connect prompt
   return res.json();
 }
 
