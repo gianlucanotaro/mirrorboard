@@ -3,6 +3,11 @@ import { fetchUsers, type User } from "./api";
 import { renderHabiticaWidget, refreshHabiticaWidget } from "./widgets/habitica";
 import { renderCalendarWidget, refreshCalendarWidget } from "./widgets/calendar";
 import { renderWeatherWidget, refreshWeatherWidget } from "./widgets/weather";
+import {
+  REFRESH_INTERVAL_CALENDAR,
+  REFRESH_INTERVAL_WEATHER,
+  REFRESH_INTERVAL_HABITICA,
+} from "./config";
 
 function renderUserSelect(users: User[]) {
   const app = document.querySelector<HTMLDivElement>("#app")!;
@@ -43,13 +48,11 @@ function renderUserSelect(users: User[]) {
   }
 }
 
-let refreshInterval: ReturnType<typeof setInterval> | null = null;
+const refreshIntervals: ReturnType<typeof setInterval>[] = [];
 
 function renderDashboard(user: User) {
-  if (refreshInterval !== null) {
-    clearInterval(refreshInterval);
-    refreshInterval = null;
-  }
+  refreshIntervals.forEach(clearInterval);
+  refreshIntervals.length = 0;
 
   const app = document.querySelector<HTMLDivElement>("#app")!;
 
@@ -73,14 +76,22 @@ function renderDashboard(user: User) {
   renderWeatherWidget(app.querySelector<HTMLDivElement>("#widget-weather")!);
   renderHabiticaWidget(app.querySelector<HTMLDivElement>("#widget-habitica")!, user.id);
 
-  refreshInterval = setInterval(() => {
-    const calEl = document.querySelector<HTMLDivElement>("#widget-calendar");
-    const wthEl = document.querySelector<HTMLDivElement>("#widget-weather");
-    const habEl = document.querySelector<HTMLDivElement>("#widget-habitica");
-    if (calEl) refreshCalendarWidget(calEl, user.id);
-    if (wthEl) refreshWeatherWidget(wthEl);
-    if (habEl) refreshHabiticaWidget(habEl, user.id);
-  }, 10_000);
+  refreshIntervals.push(
+    setInterval(() => {
+      const el = document.querySelector<HTMLDivElement>("#widget-calendar");
+      if (el) refreshCalendarWidget(el, user.id);
+    }, REFRESH_INTERVAL_CALENDAR),
+
+    setInterval(() => {
+      const el = document.querySelector<HTMLDivElement>("#widget-weather");
+      if (el) refreshWeatherWidget(el);
+    }, REFRESH_INTERVAL_WEATHER),
+
+    setInterval(() => {
+      const el = document.querySelector<HTMLDivElement>("#widget-habitica");
+      if (el) refreshHabiticaWidget(el, user.id);
+    }, REFRESH_INTERVAL_HABITICA),
+  );
 }
 
 async function init() {

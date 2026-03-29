@@ -69,8 +69,12 @@ export async function fetchCalendarToday(userId: string): Promise<CalendarEvent[
 export interface WeatherCurrent {
   temperature: number;
   apparent_temperature: number;
+  weather_code: number;
   condition: string;
   icon: string;
+  humidity: number;
+  wind_speed: number;
+  wind_dir: string;
 }
 
 export interface WeatherForecastDay {
@@ -78,6 +82,7 @@ export interface WeatherForecastDay {
   icon: string;
   high: number;
   low: number;
+  precip_prob: number;
 }
 
 export interface WeatherData {
@@ -85,6 +90,8 @@ export interface WeatherData {
   current: WeatherCurrent;
   today_high: number;
   today_low: number;
+  sunrise: string;
+  sunset: string;
   forecast: WeatherForecastDay[];
 }
 
