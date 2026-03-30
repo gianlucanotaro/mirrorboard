@@ -4,8 +4,8 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
-	"time"
 
+	"github.com/gianlucanotaro/mirrorboard/internal/config"
 	"github.com/gianlucanotaro/mirrorboard/internal/crypto"
 	"github.com/gianlucanotaro/mirrorboard/internal/db"
 	"github.com/gianlucanotaro/mirrorboard/internal/models"
@@ -21,7 +21,7 @@ func GetServices(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), config.DBOperationTimeout)
 	defer cancel()
 
 	var user models.User
@@ -82,7 +82,7 @@ func UpsertService(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), config.DBOperationTimeout)
 	defer cancel()
 
 	key := "services." + serviceName
@@ -111,7 +111,7 @@ func DeleteService(w http.ResponseWriter, r *http.Request) {
 	}
 	serviceName := r.PathValue("service")
 
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), config.DBOperationTimeout)
 	defer cancel()
 
 	key := "services." + serviceName
@@ -131,7 +131,7 @@ func DeleteService(w http.ResponseWriter, r *http.Request) {
 // DecryptedFields is a helper for internal use (e.g. when calling external APIs).
 // It returns the decrypted field values for a given user+service.
 func DecryptedFields(userID bson.ObjectID, serviceName string) (map[string]string, error) {
-	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), config.DBOperationTimeout)
 	defer cancel()
 
 	var user models.User

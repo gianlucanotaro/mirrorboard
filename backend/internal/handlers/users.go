@@ -6,13 +6,14 @@ import (
 	"net/http"
 	"time"
 
+	"github.com/gianlucanotaro/mirrorboard/internal/config"
 	"github.com/gianlucanotaro/mirrorboard/internal/db"
 	"github.com/gianlucanotaro/mirrorboard/internal/models"
 	"go.mongodb.org/mongo-driver/v2/bson"
 )
 
 func ListUsers(w http.ResponseWriter, r *http.Request) {
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), config.DBOperationTimeout)
 	defer cancel()
 
 	cursor, err := db.Database.Collection("users").Find(ctx, bson.M{})
@@ -49,7 +50,7 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	input.ID = bson.NewObjectID()
 	input.CreatedAt = time.Now()
 
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), config.DBOperationTimeout)
 	defer cancel()
 
 	if _, err := db.Database.Collection("users").InsertOne(ctx, input); err != nil {
@@ -69,7 +70,7 @@ func GetUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), config.DBOperationTimeout)
 	defer cancel()
 
 	var user models.User
@@ -103,7 +104,7 @@ func UpdateUser(w http.ResponseWriter, r *http.Request) {
 		update["name"] = input.Name
 	}
 
-	ctx, cancel := context.WithTimeout(r.Context(), 5*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), config.DBOperationTimeout)
 	defer cancel()
 
 	res, err := db.Database.Collection("users").UpdateOne(ctx, bson.M{"_id": id}, bson.M{"$set": update})

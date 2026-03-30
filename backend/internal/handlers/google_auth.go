@@ -3,8 +3,8 @@ package handlers
 import (
 	"context"
 	"net/http"
-	"time"
 
+	"github.com/gianlucanotaro/mirrorboard/internal/config"
 	googleinternal "github.com/gianlucanotaro/mirrorboard/internal/google"
 	"go.mongodb.org/mongo-driver/v2/bson"
 	"golang.org/x/oauth2"
@@ -46,7 +46,7 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	cfg := googleinternal.OAuthConfig()
-	ctx, cancel := context.WithTimeout(r.Context(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(r.Context(), config.OAuthTimeout)
 	defer cancel()
 
 	token, err := cfg.Exchange(ctx, code)
@@ -64,7 +64,7 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	dbCtx, dbCancel := context.WithTimeout(context.Background(), 5*time.Second)
+	dbCtx, dbCancel := context.WithTimeout(context.Background(), config.DBOperationTimeout)
 	defer dbCancel()
 
 	res, err := db.Database.Collection("users").UpdateOne(
@@ -81,5 +81,5 @@ func GoogleCallback(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Redirect back to the frontend dashboard
-	http.Redirect(w, r, "http://localhost:5173", http.StatusTemporaryRedirect)
+	http.Redirect(w, r, config.CORSAllowedOrigin, http.StatusTemporaryRedirect)
 }

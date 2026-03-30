@@ -6,6 +6,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/gianlucanotaro/mirrorboard/internal/config"
 	"github.com/gianlucanotaro/mirrorboard/internal/crypto"
 	"github.com/gianlucanotaro/mirrorboard/internal/db"
 	"github.com/gianlucanotaro/mirrorboard/internal/handlers"
@@ -25,14 +26,14 @@ func main() {
 
 	port := os.Getenv("PORT")
 	if port == "" {
-		port = "8080"
+		port = config.DefaultPort
 	}
 
 	mux := http.NewServeMux()
 
 	// CORS for local dev (frontend on :5173 → backend on :8080)
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Set("Access-Control-Allow-Origin", "http://localhost:5173")
+		w.Header().Set("Access-Control-Allow-Origin", config.CORSAllowedOrigin)
 		w.Header().Set("Access-Control-Allow-Methods", "GET, POST, PUT, DELETE, OPTIONS")
 		w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
 		if r.Method == http.MethodOptions {

@@ -6,9 +6,10 @@ import (
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/gianlucanotaro/mirrorboard/internal/config"
 )
 
-const apiURL = "https://api.open-meteo.com/v1/forecast"
 
 type Current struct {
 	Temperature  float64 `json:"temperature"`
@@ -54,11 +55,11 @@ func Fetch() (*Weather, error) {
 		"%s?latitude=%s&longitude=%s"+
 			"&current=temperature_2m,apparent_temperature,weather_code,relative_humidity_2m,wind_speed_10m,wind_direction_10m"+
 			"&daily=weather_code,temperature_2m_max,temperature_2m_min,sunrise,sunset,precipitation_probability_max"+
-			"&timezone=auto&forecast_days=6",
-		apiURL, lat, lon,
+			"&timezone=auto&forecast_days=%d",
+		config.WeatherAPIURL, lat, lon, config.WeatherForecastDays,
 	)
 
-	client := &http.Client{Timeout: 10 * time.Second}
+	client := &http.Client{Timeout: config.HTTPClientTimeout}
 	resp, err := client.Get(url)
 	if err != nil {
 		return nil, err

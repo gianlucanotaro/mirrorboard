@@ -4,8 +4,8 @@ import (
 	"context"
 	"log"
 	"os"
-	"time"
 
+	"github.com/gianlucanotaro/mirrorboard/internal/config"
 	"go.mongodb.org/mongo-driver/v2/mongo"
 	"go.mongodb.org/mongo-driver/v2/mongo/options"
 )
@@ -16,14 +16,14 @@ var Database *mongo.Database
 func Connect() {
 	uri := os.Getenv("MONGODB_URI")
 	if uri == "" {
-		uri = "mongodb://localhost:27017"
+		uri = config.DefaultMongoURI
 	}
 	dbName := os.Getenv("MONGODB_DB")
 	if dbName == "" {
-		dbName = "mirrorboard"
+		dbName = config.DefaultMongoDB
 	}
 
-	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+	ctx, cancel := context.WithTimeout(context.Background(), config.DBConnectTimeout)
 	defer cancel()
 
 	client, err := mongo.Connect(options.Client().ApplyURI(uri))
@@ -41,7 +41,7 @@ func Connect() {
 
 func Disconnect() {
 	if Client != nil {
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		ctx, cancel := context.WithTimeout(context.Background(), config.DBDisconnectTimeout)
 		defer cancel()
 		_ = Client.Disconnect(ctx)
 	}

@@ -1,12 +1,17 @@
 import { fetchCalendarToday, type CalendarEvent } from "../api";
+import {
+  CALENDAR_START_HOUR,
+  CALENDAR_END_HOUR,
+  CALENDAR_MIN_ROW_HEIGHT,
+  CALENDAR_LABEL_WIDTH,
+  CALENDAR_LABEL_GAP,
+  CALENDAR_EVENT_GAP,
+} from "../config";
 
-const START_HOUR = 8;
-const END_HOUR = 24;      // midnight
-const MIN_HOUR_HEIGHT = 18; // px — floor so text is still readable
-const LABEL_W = 38;       // px reserved for hour labels on the left
-const GAP = 6;            // px gap between label column and event area
-const INNER_GAP = 2;      // px gap between side-by-side overlapping events
-const HOURS = Array.from({ length: END_HOUR - START_HOUR }, (_, i) => START_HOUR + i);
+const HOURS = Array.from(
+  { length: CALENDAR_END_HOUR - CALENDAR_START_HOUR },
+  (_, i) => CALENDAR_START_HOUR + i,
+);
 
 interface TimedEvent extends CalendarEvent {
   startMin: number; // minutes from midnight
@@ -53,8 +58,8 @@ async function refreshGrid(container: HTMLElement, userId: string) {
 
   const availH = grid.clientHeight || 400;
   const hourHeight = Math.max(
-    Math.floor(availH / (END_HOUR - START_HOUR)),
-    MIN_HOUR_HEIGHT
+    Math.floor(availH / (CALENDAR_END_HOUR - CALENDAR_START_HOUR)),
+    CALENDAR_MIN_ROW_HEIGHT,
   );
 
   const newGrid = buildGrid(events, hourHeight);
@@ -104,20 +109,20 @@ function buildGrid(events: CalendarEvent[], hourHeight: number): string {
 
   const now = new Date();
   const currentMin = now.getHours() * 60 + now.getMinutes();
-  const showNow = currentMin >= START_HOUR * 60 && currentMin < END_HOUR * 60;
-  const nowTop = ((currentMin - START_HOUR * 60) / 60) * hourHeight;
+  const showNow = currentMin >= CALENDAR_START_HOUR * 60 && currentMin < CALENDAR_END_HOUR * 60;
+  const nowTop = ((currentMin - CALENDAR_START_HOUR * 60) / 60) * hourHeight;
 
   const hourLines = HOURS.map((h) => {
-    const top = (h - START_HOUR) * hourHeight;
+    const top = (h - CALENDAR_START_HOUR) * hourHeight;
     return `
       <div style="position:absolute;top:${top}px;left:0;right:0;pointer-events:none;">
         <span style="
-          position:absolute;left:0;top:-7px;width:${LABEL_W}px;
+          position:absolute;left:0;top:-7px;width:${CALENDAR_LABEL_WIDTH}px;
           font-size:9px;color:var(--color-muted);text-align:right;
           padding-right:4px;line-height:1;font-family:'Open Sans',sans-serif;
         ">${h < 10 ? "0" + h : h}:00</span>
         <div style="
-          position:absolute;left:${LABEL_W + GAP}px;right:0;top:0;
+          position:absolute;left:${CALENDAR_LABEL_WIDTH + CALENDAR_LABEL_GAP}px;right:0;top:0;
           height:1px;background:var(--color-border);
         "></div>
       </div>
@@ -126,7 +131,7 @@ function buildGrid(events: CalendarEvent[], hourHeight: number): string {
 
   const nowLine = showNow
     ? `
-    <div style="position:absolute;top:${nowTop}px;left:${LABEL_W}px;right:0;z-index:10;pointer-events:none;">
+    <div style="position:absolute;top:${nowTop}px;left:${CALENDAR_LABEL_WIDTH}px;right:0;z-index:10;pointer-events:none;">
       <div style="position:absolute;left:4px;right:0;top:-1px;height:2px;background:#ef4444;border-radius:1px;"></div>
       <div style="position:absolute;left:0;top:-3px;width:6px;height:6px;border-radius:50%;background:#ef4444;"></div>
     </div>
@@ -135,11 +140,11 @@ function buildGrid(events: CalendarEvent[], hourHeight: number): string {
 
   const eventBlocks = timed
     .map((e) => {
-      const startMin = Math.max(e.startMin, START_HOUR * 60);
-      const endMin = Math.min(e.endMin, END_HOUR * 60);
+      const startMin = Math.max(e.startMin, CALENDAR_START_HOUR * 60);
+      const endMin = Math.min(e.endMin, CALENDAR_END_HOUR * 60);
       if (startMin >= endMin) return "";
 
-      const top = ((startMin - START_HOUR * 60) / 60) * hourHeight;
+      const top = ((startMin - CALENDAR_START_HOUR * 60) / 60) * hourHeight;
       const height = Math.max(((endMin - startMin) / 60) * hourHeight, 18);
       const leftPct = (e.col / e.totalCols) * 100;
       const widthPct = (1 / e.totalCols) * 100;
@@ -152,8 +157,8 @@ function buildGrid(events: CalendarEvent[], hourHeight: number): string {
           position:absolute;
           top:${top}px;
           height:${height}px;
-          left:calc(${leftPct}% + ${INNER_GAP}px);
-          width:calc(${widthPct}% - ${INNER_GAP * 2}px);
+          left:calc(${leftPct}% + ${CALENDAR_EVENT_GAP}px);
+          width:calc(${widthPct}% - ${CALENDAR_EVENT_GAP * 2}px);
           background-color:${color}28;
           border-left:2px solid ${color};
           border-radius:0 3px 3px 0;
@@ -171,7 +176,7 @@ function buildGrid(events: CalendarEvent[], hourHeight: number): string {
   return `
     ${hourLines}
     ${nowLine}
-    <div style="position:absolute;top:0;left:${LABEL_W + GAP}px;right:0;bottom:0;">
+    <div style="position:absolute;top:0;left:${CALENDAR_LABEL_WIDTH + CALENDAR_LABEL_GAP}px;right:0;bottom:0;">
       ${eventBlocks}
     </div>
   `;

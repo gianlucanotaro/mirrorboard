@@ -5,14 +5,10 @@ import (
 	"fmt"
 	"net/http"
 	"sync"
-	"time"
+
+	"github.com/gianlucanotaro/mirrorboard/internal/config"
 )
 
-const (
-	baseURL     = "https://habitica.com/api/v3"
-	clientID    = "MirrorBoard"
-	httpTimeout = 10 * time.Second
-)
 
 type Client struct {
 	userID string
@@ -24,7 +20,7 @@ func NewClient(userID, token string) *Client {
 	return &Client{
 		userID: userID,
 		token:  token,
-		http:   &http.Client{Timeout: httpTimeout},
+		http:   &http.Client{Timeout: config.HTTPClientTimeout},
 	}
 }
 
@@ -93,7 +89,7 @@ func (c *Client) GetAllTasks() (*AllTasks, error) {
 }
 
 func fetchTasks[T any](c *Client, taskType string) ([]T, error) {
-	req, err := http.NewRequest("GET", baseURL+"/tasks/user?type="+taskType, nil)
+	req, err := http.NewRequest("GET", config.HabiticaBaseURL+"/tasks/user?type="+taskType, nil)
 	if err != nil {
 		return nil, err
 	}
@@ -133,6 +129,6 @@ func nilToEmpty[T any](s []T) []T {
 func (c *Client) setHeaders(r *http.Request) {
 	r.Header.Set("x-api-user", c.userID)
 	r.Header.Set("x-api-key", c.token)
-	r.Header.Set("x-client", c.userID+"-"+clientID)
+	r.Header.Set("x-client", c.userID+"-"+config.HabiticaClientID)
 	r.Header.Set("Content-Type", "application/json")
 }
